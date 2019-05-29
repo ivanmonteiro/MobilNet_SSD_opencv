@@ -33,11 +33,19 @@ else:
     cap = cv2.VideoCapture(0)
 
 #Load the Caffe model 
-net = cv2.dnn.readNetFromCaffe(args.prototxt, args.weights)
+#net = cv2.dnn.readNetFromCaffe(args.prototxt, args.weights)
+net = cv2.dnn.readNetFromTensorflow('models/ssd_mobilenet_v1_coco_2017_11_17/frozen_inference_graph.pb',
+                                      'models/ssd_mobilenet_v1_coco_2017_11_17/ssd_mobilenet_v1_coco_2017_11_17.pbtxt')
+#net = cv2.dnn.readNetFromTensorflow('models/ssd_mobilenet_v1_ppn_shared_box_predictor_300x300_coco14_sync_2018_07_03/frozen_inference_graph.pb',
+#                                    'models/ssd_mobilenet_v1_ppn_shared_box_predictor_300x300_coco14_sync_2018_07_03/ssd_mobilenet_v1_ppn_coco.pbtxt')
+
+
+
 
 while True:
     # Capture frame-by-frame
     ret, frame = cap.read()
+    
     frame_resized = cv2.resize(frame,(300,300)) # resize frame for prediction
 
     # MobileNet requires fixed dimensions for input image(s)
@@ -46,12 +54,14 @@ while True:
     # We perform a mean subtraction (127.5, 127.5, 127.5) to normalize the input;
     # after executing this command our "blob" now has the shape:
     # (1, 3, 300, 300)
-    blob = cv2.dnn.blobFromImage(frame_resized, 0.007843, (300, 300), (127.5, 127.5, 127.5), False)
+    #blob = cv2.dnn.blobFromImage(frame_resized, 0.007843, (300, 300), (127.5, 127.5, 127.5), False)
     #Set to network the input blob 
-    net.setInput(blob)
+    #net.setInput(blob)
+    
+    net.setInput(cv2.dnn.blobFromImage(frame, size=(300, 300), swapRB=True, crop=False))
     #Prediction of network
     detections = net.forward()
-
+    
     #Size of frame resize (300x300)
     cols = frame_resized.shape[1] 
     rows = frame_resized.shape[0]
@@ -95,7 +105,7 @@ while True:
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0))
 
                 print(label) #print class and confidence
-
+    
     cv2.namedWindow("frame", cv2.WINDOW_NORMAL)
     cv2.imshow("frame", frame)
     if cv2.waitKey(1) >= 0:  # Break with ESC 

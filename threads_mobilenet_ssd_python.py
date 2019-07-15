@@ -12,7 +12,7 @@ import cv2
 
 # construct the argument parse 
 parser = argparse.ArgumentParser(
-    description='Script to run MobileNet-SSD object detection network ')
+description='Script to run MobileNet-SSD object detection network ')
 parser.add_argument("--video", help="path to video file. If empty, camera's stream will be used")
 parser.add_argument("--prototxt", default="MobileNetSSD_deploy.prototxt",
                                   help='Path to text network file: '
@@ -40,7 +40,7 @@ else:
     ##sem multi thread
     #cap = cv2.VideoCapture(cv2.CAP_DSHOW)
     ##com multi thread
-    cap = WebcamVideoStream(cv2.CAP_DSHOW).start()#
+    cap = WebcamVideoStream(src=0).start()#
 
 #Load the Caffe model 
 #net = cv2.dnn.readNetFromCaffe(args.prototxt, args.weights)
@@ -131,7 +131,7 @@ while fps._numFrames < 100:
     fps.update()
     if cv2.waitKey(1) >= 0:  # Break with ESC 
         break
-			
+            
 fps.stop()
 print("[INFO] elasped time: {:.2f}".format(fps.elapsed()))
 print("[INFO] approx. FPS: {:.2f}".format(fps.fps()))
